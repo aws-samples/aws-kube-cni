@@ -2,11 +2,11 @@
 :linkcss:
 :imagesdir: ./images
 
-= Using the Amazon VPC CNI for Kubernetes + Calico network policy enforcement in a Kops cluster.
+= Using the Amazon VPC CNI for Kubernetes + Calico network policy enforcement in a kops cluster.
 
 === tl:dr steps:
 
-* Install a cluster with Kops
+* Install a cluster with kops
 * Modify IAM policy on ec2 instances (`cni.policy.yaml` included in this repo)
 * Assure all traffic is allowed between the master and node security groups and all traffic is allowed within the security groups.
 * Pass `--node-ip <ip-address>` to kubelet on all master and node instances, where <ip-address> equals the primary ip address on eth0 of the ec2 instance
@@ -16,9 +16,9 @@
 
 === Pre-Requisites
 
-==== Install a cluster with Kops
+==== Install a cluster with kops
 
-===== Install KOPS on your local machine:
+===== Install kops on your local machine:
 
 https://github.com/kubernetes/kops/blob/master/docs/install.md
 
@@ -35,11 +35,11 @@ image::01-create-bucket.png[bucket]
 Assure you use the same prefix you defined above to the state store below:
 
     export NAME=awscni.k8s.local
-    export KOPS_STATE_STORE=s3://prefix-example-state-store
+    export kops_STATE_STORE=s3://prefix-example-state-store
 
 image::02-set-envvar.png[env]
 
-====== Deploy cluster with KOPS
+====== Deploy cluster with kops
 
 This example will deploy a kubernetes cluster in us-east-2a:
 
@@ -48,7 +48,7 @@ This example will deploy a kubernetes cluster in us-east-2a:
 image::03-create-cluster.png[cluster]
 
 ===== Verify nodes
-In a few minutes a single master dual node cluster will be deployed into your account. KOPs will automatically configure the Kubernetes contexts in your config file. From here let's make sure we can access the node from kubectl:
+In a few minutes a single master dual node cluster will be deployed into your account. kops will automatically configure the Kubernetes contexts in your config file. From here let's make sure we can access the node from kubectl:
 
     kubectl get nodes
 
