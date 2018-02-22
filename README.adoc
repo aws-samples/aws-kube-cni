@@ -206,9 +206,12 @@ This demonstration has shown how you can leverage the aws kubernetes cni in your
 To remove all resources created by this example do the following:
 
 1. Delete the policy-demo namespace (this will delete all of the resources in the namespace as well):
+
     kubectl delete ns --policy-demo
+    
 2. Remove the customer policy from the node and master IAM roles
-3. Delete the cluster with kops
+3. Delete the cluster with kops:
+
     kubectl delete cluster awscni.k8s.local --yes
 
 == License Summary
