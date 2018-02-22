@@ -2,7 +2,7 @@
 :linkcss:
 :imagesdir: ./images
 
-= Using the Amazon VPC CNI for Kubernetes with KOPS
+= Using the Amazon VPC CNI + Calico network policy enforcement for Kubernetes with KOPS
 
 === tl:dr
 
