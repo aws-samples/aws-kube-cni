@@ -2,32 +2,35 @@
 :linkcss:
 :imagesdir: ./images
 
-= Using the Amazon VPC CNI + Calico network policy enforcement for Kubernetes with KOPS
+= Using the Amazon VPC CNI for Kubernetes + Calico network policy enforcement in a Kops cluster.
 
-=== tl:dr
+=== tl:dr steps:
 
-* Install a cluster with kops
-* Add the IAM policy and master nodes (cni.policy.yaml included in this repo)
+* Install a cluster with Kops
+* Modify IAM policy on ec2 instances (`cni.policy.yaml` included in this repo)
 * Assure all traffic is allowed between the master and node security groups and all traffic is allowed within the security groups.
-* Pass --node-ip <ip-address> to kubelet on all master and node instances, where <ip-address> equals the primary ip address on eth0 of the ec2 instance
-* Apply the aws-cni.yaml file to your cluster
-* Apply the calico.yaml file to your cluster
+* Pass `--node-ip <ip-address>` to kubelet on all master and node instances, where <ip-address> equals the primary ip address on eth0 of the ec2 instance
+* Apply the `aws-cni.yaml` file to your cluster
+* Apply the `calico.yaml` file to your cluster
 * Apply and test network policy enforcement
 
 === Pre-Requisites
 
-==== Install KOPS on your local machine:
+==== Install a cluster with Kops
+
+===== Install KOPS on your local machine:
 
 https://github.com/kubernetes/kops/blob/master/docs/install.md
 
-==== Create an s3 bucket for Cluster State
+===== Create an s3 bucket for Cluster State
 
 Add a custom prefix to the bucket name below:
 
     aws s3api create-bucket --bucket prefix-example-com-state-store --region us-east-1
 
 image::01-create-bucket.png[bucket]
-==== Setup environment variables
+
+===== Setup environment variables
 
 Assure you use the same prefix you defined above to the state store below:
 
@@ -35,14 +38,16 @@ Assure you use the same prefix you defined above to the state store below:
     export KOPS_STATE_STORE=s3://prefix-example-state-store
 
 image::02-set-envvar.png[env]
-==== Deploy cluster with KOPS
+
+====== Deploy cluster with KOPS
 
 This example will deploy a kubernetes cluster in us-east-2a:
 
     kops create cluster --zones us-east-2a --networking cni --yes --name ${NAME}
 
 image::03-create-cluster.png[cluster]
-==== Verify nodes
+
+===== Verify nodes
 In a few minutes a single master dual node cluster will be deployed into your account. KOPs will automatically configure the Kubernetes contexts in your config file. From here let's make sure we can access the node from kubectl:
 
     kubectl get nodes
@@ -51,7 +56,9 @@ This will only display the master node in a not ready status for now. We need to
 
 image::04-get-nodes.png[nodes]
 
-==== Create a customer managed policy
+==== Modify IAM policy on ec2 instances
+
+===== Create a customer managed policy
 
 First we need to modify the IAM policy attached to the masters and nodes to allow them to allocate IP addresses and ENIs from the VPC network.
 
@@ -71,7 +78,7 @@ From here copy and paste the contents from the file "cni-policy.json" (included 
 
 The next screen will allow you to review the permissions and provide the policy a name, for the purpose of this walkthrough let's name the policy "aws-cni".
 
-==== Apply the policy to the nodes and the masters
+===== Apply the policy to the nodes and the masters
 
 From the IAM console select the roles menu from the left and then search for "awscni" in the search box.
 
@@ -82,6 +89,7 @@ Next select the "masters.awscni.k8s.local" role and apply the customer managed p
 image::08-attach-policy.png[attach]
 
 Repeat for the "nodes.awscni.k8s.local" policy.
+
 ==== Modify Security Groups
 
 Next we need to modify the security groups to allow all traffic from/to and within the master and node security groups.
@@ -97,6 +105,16 @@ Create a new inbound rule to allow all traffic from the nodes group.
 image::10-security-groups.png[security-group]
 
 All of the other rules should already exist, at the end what you need to verify is that all traffic flows freely between the masters and nodes security group in addition to all traffic within the groups themselves (all traffic from master security group to master security group).
+
+=== Set node-ip flag on kubelet
+
+ssh into each instance and retrieve the primary ip address:
+
+    curl http://169.254.169.254/latest/meta-data/local-ipv4
+
+Add the --node-ip flag with the value retrieved from above to the kubelet config `/etc/sysconfig/kubelet` and restart kubelet:
+
+    sudo systemctl restart kubelet
 
 === Deploy the AWS CNI plugin
 
