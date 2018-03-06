@@ -48,7 +48,7 @@ This example will deploy a kubernetes cluster in us-east-2a:
 image::03-create-cluster.png[cluster]
 
 ===== Verify nodes
-In a few minutes a single master dual node cluster will be deployed into your account. kops will automatically configure the Kubernetes contexts in your config file. From here let's make sure we can access the node from kubectl:
+In a few minutes a single-master/dual-node cluster will be deployed into your account. kops will automatically configure the Kubernetes contexts in your config file. From here let's make sure we can access the node from kubectl:
 
     kubectl get nodes
 
