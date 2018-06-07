@@ -35,7 +35,7 @@ image::01-create-bucket.png[bucket]
 Assure you use the same prefix you defined above to the state store below:
 
     export NAME=awscni.k8s.local
-    export kops_STATE_STORE=s3://prefix-example-state-store
+    export KOPS_STATE_STORE=s3://prefix-example-state-store
 
 image::02-set-envvar.png[env]
 
