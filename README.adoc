@@ -212,7 +212,7 @@ To remove all resources created by this example do the following:
 2. Remove the customer policy from the node and master IAM roles
 3. Delete the cluster with kops:
 
-    kubectl delete cluster awscni.k8s.local --yes
+    kops delete cluster awscni.k8s.local --yes
 
 == License Summary
 
